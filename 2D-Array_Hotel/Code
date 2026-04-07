@@ -1,0 +1,77 @@
+package main;
+
+import java.util.*;
+
+public class Sadaya_568050 {
+
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		
+		int hotel[][] = new int[7][5];
+		
+		int floors = 7;
+		int rooms = 5;
+		
+		int choice = 0;
+		while(choice != 4) {
+		System.out.println("\n===== [Hotel Reservation System] =====");
+			System.out.println("1. View Rooms");
+			System.out.println("2. Check In");
+			System.out.println("3. Check Out");
+			System.out.println("4. Exit");
+			
+				System.out.print("\nEnter Choice: ");
+		        choice = sc.nextInt();
+		        
+			switch (choice) {
+			
+			case 1:
+				System.out.println("\nRoom Status (0 = Available, 1 = Occupied");
+				for(int i = 0; i < floors; i++) {
+					System.out.print("Floor " + (i + 1) + ":");
+					for(int j = 0; j < rooms; j++) {
+						System.out.print("[" + hotel[i][j] +"]");
+					}
+					System.out.println();
+				}
+				break;
+				
+			case 2:
+				System.out.print("Enter floor number(1-7): ");
+				int F = sc.nextInt() - 1;
+				
+				System.out.print("Enter room number(1-5): ");
+				int R = sc.nextInt() - 1;
+				
+					if (hotel[F][R] == 0) {
+						hotel[F][R] = 1;
+						System.out.println("\nCheck-in Successful!");
+					} else {
+							System.out.println("\nRoom is already occupied!");
+						}
+					break;
+					
+			case 3: 
+				System.out.print("Enter floor number(1-7): ");
+				int OutF = sc.nextInt() - 1;
+				
+				System.out.print("Enter room number(1-5): ");
+				int OutR = sc.nextInt() - 1;
+				
+					if (hotel[OutF][OutR] == 1) {
+						hotel[OutF][OutR] = 0;
+						System.out.println("\nCheck-out Successful!");
+					} else {
+							System.out.println("\nRoom is already empty!");
+						}
+					break;
+				
+			case 4:
+				System.out.println("\nExiting system...");
+                break;
+			}
+			
+		}
+	}
+
+}
