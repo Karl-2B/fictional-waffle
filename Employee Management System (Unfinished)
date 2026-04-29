@@ -10,7 +10,6 @@ public class Employee  extends JFrame{
 	static JTextField employeeID, fullName, birthDate, Age, Nationality, contactNumber, Email, Department, Job;
 	JRadioButton Male,Female;
 	
-	
 	Employee() {
 		
 		JLabel Title = new JLabel("EMS Inc.");
