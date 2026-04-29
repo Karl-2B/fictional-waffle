@@ -1,7 +1,7 @@
 package sadaya_568050;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel; // Added for Table model
+import javax.swing.table.DefaultTableModel;
 import java.io.*;
 import java.awt.Color;
 
