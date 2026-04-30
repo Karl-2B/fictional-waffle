@@ -1,0 +1,55 @@
+package sadaya_568050;
+
+import java.io.*;
+import javax.swing.*;
+import java.awt.Color;
+
+public class Conversion extends JFrame{
+	
+	static JTextField decimal, binary;
+	
+	Conversion() {
+		
+		JLabel Title = new JLabel("Decimal Number to Binary Converter");
+		add(Title).setBounds(130,20,250,20);
+		
+		JLabel Decimal = new JLabel("Enter Decimal Number:");
+		add(Decimal).setBounds(30,45,250,20);
+		
+		decimal = new JTextField();
+		add(decimal).setBounds(30,65,170,20);
+		
+		JLabel Binary = new JLabel("Binary Equivalent");
+		add(Binary).setBounds(250,45,250,20);
+		
+		binary = new JTextField();
+		add(binary).setBounds(250,65,170,20);
+		binary.setEditable(false);
+		
+		
+		JButton Convert = new JButton("Convert to Binary");
+		add(Convert).setBounds(150,100,150,20);
+		
+		Convert.addActionListener(e -> {
+			try {
+				int converter = Integer.parseInt(decimal.getText());
+				binary.setText(Integer.toBinaryString(converter));
+			}catch (Exception e1) {
+				binary.setText("Limit Reached | Invalid Input");
+			}
+		});
+		
+		
+		setTitle("Conversion Number Systems");
+		setLayout(null);
+		setSize(500,200);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setVisible(true);
+	}
+
+	public static void main(String[] args) {
+		new Conversion();
+
+	}
+
+}
