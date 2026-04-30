@@ -31,8 +31,18 @@ public class Conversion extends JFrame{
 		
 		Convert.addActionListener(e -> {
 			try {
-				int converter = Integer.parseInt(decimal.getText());
-				binary.setText(Integer.toBinaryString(converter));
+				int decimal1 = Integer.parseInt(decimal.getText());
+					StringBuilder sb = new StringBuilder();
+					int decimal2 = decimal1;
+					
+					while (decimal1 > 0) {
+						int remainder = decimal1 % 2;
+						decimal1 = decimal1 / 2;
+						sb.insert(0, remainder);
+					
+						binary.setText(sb.toString());
+					}
+				
 			}catch (Exception e1) {
 				binary.setText("Limit Reached | Invalid Input");
 			}
