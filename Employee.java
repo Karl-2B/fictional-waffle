@@ -3,11 +3,14 @@ package sadaya_568050;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.io.*;
-import java.awt.Color;
+import java.util.ArrayList;
+import java.awt.*;
 
 public class Employee  extends JFrame{
 	
-	static JTextField employeeID, fullName, birthDate, Age, civilStatus, Nationality, contactNumber, Email, Department, Job;
+	static JTextField employeeID, fullName, birthDate, Age, Nationality, contactNumber, Email, Department, Job;
+	static JComboBox<String> civilStatus;
+	static ButtonGroup genderGroup;
 	static String selectedGender;
 	static JRadioButton Male,Female;
 	static JTable table;
@@ -46,7 +49,7 @@ public class Employee  extends JFrame{
 		JLabel civilTitle = new JLabel("Civil Status");
 		add(civilTitle).setBounds(220,95,100,20);
 		
-		JComboBox<String> civilStatus = new JComboBox<>();
+		civilStatus = new JComboBox<>();
 		add(civilStatus).setBounds(220,115,160,20);
 		civilStatus.addItem("Single");
 		civilStatus.addItem("Married");
@@ -71,7 +74,7 @@ public class Employee  extends JFrame{
 		Female.setActionCommand("Female");
 		add(Female).setBounds(465, 70, 80, 20);
 		
-		ButtonGroup genderGroup = new ButtonGroup();
+		genderGroup = new ButtonGroup();
 		genderGroup.add(Male);
 		genderGroup.add(Female);
 		
@@ -102,6 +105,7 @@ public class Employee  extends JFrame{
 		String[] Columns = {"Employee ID", "Fullname", "Birth", "Age", "Civil Status", "Nationality", "Gender", "Contact", "Email", "Department", "Job Title"};
 		model = new DefaultTableModel(Columns, 0);
 		table = new JTable(model);
+		table.setDefaultEditor(Object.class, null);
 		table.getTableHeader().setForeground(Color.BLACK);
 		table.getTableHeader().setBackground(Color.CYAN);
 		JScrollPane scroller = new JScrollPane(table);
@@ -109,6 +113,34 @@ public class Employee  extends JFrame{
 		
 		JButton Add = new JButton("Add Employee");
 		add(Add).setBounds(615,195,130,20);
+		
+		JButton Update = new JButton("Update");
+		add(Update).setBounds(470,195,130,20);
+		
+		JButton Delete = new JButton("Delete");
+		add(Delete).setBounds(325,195,130,20);
+		
+		
+		table.addMouseListener(new java.awt.event.MouseAdapter() {
+		    public void mouseClicked(java.awt.event.MouseEvent evt) {
+		        int row = table.getSelectedRow();
+		        employeeID.setText(model.getValueAt(row, 0).toString());
+		        fullName.setText(model.getValueAt(row, 1).toString());
+		        birthDate.setText(model.getValueAt(row, 2).toString());
+		        Age.setText(model.getValueAt(row, 3).toString());
+		        civilStatus.setSelectedItem(model.getValueAt(row, 4).toString());
+		        Nationality.setText(model.getValueAt(row, 5).toString());
+		        
+		        String gender = model.getValueAt(row, 6).toString();
+		        if (gender.equals("Male")) Male.setSelected(true);
+		        else if (gender.equals("Female")) Female.setSelected(true);
+		        
+		        contactNumber.setText(model.getValueAt(row, 7).toString());
+		        Email.setText(model.getValueAt(row, 8).toString());
+		        Department.setText(model.getValueAt(row, 9).toString());
+		        Job.setText(model.getValueAt(row, 10).toString());
+		    }
+		});
 		
 		read();
 		Add.addActionListener(e -> {
@@ -146,15 +178,103 @@ public class Employee  extends JFrame{
 			
 		});
 		
+		Delete.addActionListener(e1 -> {
+	            int row = table.getSelectedRow();
+	            if (row == -1) {
+	                JOptionPane.showMessageDialog(null, "Select a record first.");
+	                return;
+	            }
+
+	            ArrayList<String> list = new ArrayList<>();
+
+	            try (BufferedReader br = new BufferedReader(new FileReader("employees.txt"))) {
+	                String line;
+	                int i = 0;
+
+	                while ((line = br.readLine()) != null) {
+	                    if (i != row) list.add(line);
+	                    i++;
+	                }
+	            } catch (IOException ex) {
+	                System.out.println(ex);
+	            }
+
+	            try (BufferedWriter bw = new BufferedWriter(new FileWriter("employees.txt"))) {
+	                for (String s : list) bw.write(s + "\n");
+	            } catch (IOException ex) {
+	                System.out.println(ex);
+	            }
+
+	            read();
+	            clearFields();
+	            JOptionPane.showMessageDialog(null, "Deleted Successfully!");
+		});
+		
+		Update.addActionListener(e2 -> {
+			int row = table.getSelectedRow();
+            if (row == -1) {
+                JOptionPane.showMessageDialog(null, "Select a record first.");
+                return;
+            }
+
+            ArrayList<String> list = new ArrayList<>();
+            
+            String gender = "";
+            if (genderGroup.getSelection() != null) {
+                gender = genderGroup.getSelection().getActionCommand();
+            }
+            
+            try (BufferedReader br = new BufferedReader(new FileReader("employees.txt"))) {
+                String line;
+                int i = 0;
+
+                while ((line = br.readLine()) != null) {
+                    if (i == row) {
+                        list.add(employeeID.getText() + " - " + 
+                                fullName.getText() + " - " + 
+                                birthDate.getText() + " - " + 
+                                Age.getText() + " - " + 
+                                civilStatus.getSelectedItem().toString() + " - " + 
+                                Nationality.getText() + " - " + 
+                                gender + " - " + 
+                                contactNumber.getText() + " - " + 
+                                Email.getText() + " - " + 
+                                Department.getText() + " - " + 
+                                Job.getText());
+                    } else {
+                        list.add(line);
+                    }
+                    i++;
+                }
+            } catch (IOException ex) {
+                System.out.println(ex);
+            }
+
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter("employees.txt"))) {
+                for (String s : list) bw.write(s + "\n");
+            } catch (IOException ex) {
+                System.out.println(ex);
+            }
+
+            read();
+            clearFields();
+            JOptionPane.showMessageDialog(null, "Updated Successfully!");
+		});
+		
 		setTitle("Employee Management System");
 		setLayout(null);
-		setSize(800,500);
+		setSize(800,550);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setVisible(true);
 	}
 	
 	public static void read() {
 		model.setRowCount(0);
+		File file = new File("employees.txt");
+		
+		if (!file.exists()) {
+	        return; 
+	    }
 		
 		try (BufferedReader br = new BufferedReader(new FileReader("employees.txt"))) {
 			String line;
@@ -167,6 +287,27 @@ public class Employee  extends JFrame{
 		}
 			
 	}
+	
+	public static void clearFields() {
+	       employeeID.setText("");
+	       fullName.setText("");
+	       birthDate.setText("");
+	       Age.setText("");
+	       Nationality.setText("");
+	       contactNumber.setText("");
+	       Email.setText("");
+	       Department.setText("");
+	       Job.setText("");
+	       
+	       if (civilStatus != null) {
+	           civilStatus.setSelectedIndex(0);
+	       }
+	       
+	       if (genderGroup != null) {
+	           genderGroup.clearSelection();
+	       }
+	       
+	    }
 	
 	public static void main(String[] args) {
 		new Employee();
