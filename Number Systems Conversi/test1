@@ -9,7 +9,6 @@ public class Conversion extends JFrame{
 	static JTextField Input, Output;
 	static JComboBox<String> numberSystems;
 	
-	
 	Conversion() {
 		JLabel sourceTitle = new JLabel("Conversion Options");
 		add(sourceTitle).setBounds(30,10,170,20);
