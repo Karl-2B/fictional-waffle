@@ -1,82 +1,100 @@
-package sadaya_568050;
+package sadaya568050;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.io.*;
 import java.awt.Color;
 
-public class ExpenseTracker extends JFrame{
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.*;
+import java.util.ArrayList;
+
+public class SIF extends JFrame{
 	
-	static JTextField receiptNumber, nameStore, costTotal, Taxes, amountFinal;
-	JTable table;
-	DefaultTableModel model;
+	static JTextField name, course, section;
+	static JTable table;
+	static DefaultTableModel model;
 	
-	ExpenseTracker() {
+	SIF(){
 		
-		JLabel Title = new JLabel("EXPENSE TRACKER");
-		add(Title).setBounds(175,30,150,10);
+		JLabel nameTitle = new JLabel("Name");
+		add(nameTitle).setBounds(5,10,40,20);
 		
-		JLabel receiptNo = new JLabel("Receipt Number:");
-		add(receiptNo).setBounds(30,70,175,25);
+		name = new JTextField();
+		add(name).setBounds(5,30,135,20);
 		
-		receiptNumber = new JTextField();
-		add(receiptNumber).setBounds(150,70,200,20);
+		JLabel courseTitle = new JLabel("Course");
+		add(courseTitle).setBounds(148,10,100,20);
 		
-		JLabel storeName = new JLabel("Store Name:");
-		add(storeName).setBounds(30,100,175,25);
+		course = new JTextField();
+		add(course).setBounds(148,30,135,20);
 		
-		nameStore = new JTextField();
-		add(nameStore).setBounds(150,100,200,20);
+		JLabel sectionTitle = new JLabel("Section");
+		add(sectionTitle).setBounds(290,10,100,20);
 		
-		JLabel TotalCost = new JLabel("Total Cost:");
-		add(TotalCost).setBounds(30,130,175,25);
+		section = new JTextField();
+		add(section).setBounds(290,30,135,20);
 		
-		costTotal = new JTextField();
-		add(costTotal).setBounds(150,130,200,20);
+		JButton Add = new JButton("Add");
+		add(Add).setBounds(20,60,90,25);
 		
-		JLabel Tax = new JLabel("Tax(12%):");
-		add(Tax).setBounds(30,175,175,25);
+		JButton Update = new JButton("Update");
+		add(Update).setBounds(120,60,90,25);
 		
-		Taxes = new JTextField();
-		add(Taxes).setBounds(150,175,200,20);
-		Taxes.setEditable(false);
+		JButton Delete = new JButton("Delete");
+		add(Delete).setBounds(220,60,90,25);
 		
-		JLabel finalAmount = new JLabel("Total Cost:");
-		add(finalAmount).setBounds(30,200,175,25);
+		JButton Clear = new JButton("Clear");
+		add(Clear).setBounds(320,60,90,25);
+	
 		
-		amountFinal = new JTextField();
-		add(amountFinal).setBounds(150,200,200,20);
-		amountFinal.setEditable(false);
-		
-		String[] columns = {"Receipt #", "Store", "Cost", "Tax", "Final"};
-		model = new DefaultTableModel(columns, 0);
+		String[] column = {"Name", "Courses", "Section"};
+		model = new DefaultTableModel(column, 0);
 		table = new JTable(model);
 		table.getTableHeader().setForeground(Color.BLACK);
 		table.getTableHeader().setBackground(Color.CYAN);
-		JScrollPane scrollPane = new JScrollPane(table);
-		add(scrollPane).setBounds(380, 70, 380, 200);
+		table.setBorder(null);
+		table.setDefaultEditor(Object.class, null);
+		table.setBackground(getContentPane().getBackground());
+		
+		JScrollPane scroller = new JScrollPane(table);
+		add(scroller).setBounds(10,90,410,265);
+	
+		
+		table.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                int selectedRow = table.getSelectedRow();
+                if (selectedRow >= 0) {
+                    name.setText(model.getValueAt(selectedRow, 0).toString());
+                    course.setText(model.getValueAt(selectedRow, 1).toString());
+                    section.setText(model.getValueAt(selectedRow, 2).toString());
+                }
+            }
+        });
+		
+		try {
+		    File file = new File("StudentInfo.txt");
 
-		JButton Record = new JButton("Record");
-		add(Record).setBounds(70,240,105,30);
+		    if (!file.exists()) {
+		        file.createNewFile();
+		    }
+
+		} catch (IOException e) {
+		    System.out.println(e);
+		}
 		
-		Record.addActionListener(e -> {
+		read();
+		Add.addActionListener(e -> {
 			try {
-				FileWriter writer = new FileWriter("data.txt", true);
-				int number = Integer.parseInt(receiptNumber.getText());
-				String name = nameStore.getText();
-				int Total = Integer.parseInt(costTotal.getText());
-		
+				FileWriter writer = new FileWriter("StudentInfo.txt",true);
+				String names = name.getText();
+				String courses = course.getText();
+				String sections = section.getText();
 				
-				double Taxes1 = Total*0.12;
-				double Final = Total + Taxes1;
-				
-				Taxes.setText(String.valueOf(Taxes1));
-				amountFinal.setText(String.valueOf(Final));
-				
-				writer.write(number + ", " + name + ", " + Total + ", " + Taxes1 + ", " + Final + "\n");
+				writer.write(names + " - " + courses + " - " + sections + "\n");
 				writer.close();
 				
-				model.addRow(new Object[]{number, name, Total, Taxes1, Final});
+				read();
 				
 				JOptionPane.showMessageDialog(null, "Saved Successfully!");
 				
@@ -84,32 +102,112 @@ public class ExpenseTracker extends JFrame{
 				System.err.println("System Error" + e1);
 			}
 			
-			
 		});
 		
-		JButton Clear = new JButton("Clear");
-		add(Clear).setBounds(220,240,105,30);
-		
-		Clear.addActionListener(e2 -> {
-			receiptNumber.setText("");
-			nameStore.setText("");
-			costTotal.setText("");
-			Taxes.setText("");
-			amountFinal.setText("");
+		Update.addActionListener(e3 -> {
+			int row = table.getSelectedRow();
+            if (row == -1) {
+                JOptionPane.showMessageDialog(null, "Select a record first.");
+                return;
+            }
+
+            ArrayList<String> list = new ArrayList<>();
+            try (BufferedReader br = new BufferedReader(new FileReader("StudentInfo.txt"))) {
+                String line;
+                int i = 0;
+
+                while ((line = br.readLine()) != null) {
+                    if (i == row) {
+                        list.add(name.getText() + " - " + course.getText() + " - " + section.getText());
+                    } else {
+                        list.add(line);
+                    }
+                    i++;
+                }
+            } catch (IOException ex) {
+                System.out.println(ex);
+            }
+
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter("StudentInfo.txt"))) {
+                for (String s : list) bw.write(s + "\n");
+            } catch (IOException ex) {
+                System.out.println(ex);
+            }
+
+            read();
+            clearFields();
+            JOptionPane.showMessageDialog(null, "Updated Successfully!");
 		});
 		
+		Delete.addActionListener(e4 -> {
+            int row = table.getSelectedRow();
+            if (row == -1) {
+                JOptionPane.showMessageDialog(null, "Select a record first.");
+                return;
+            }
+
+            ArrayList<String> list = new ArrayList<>();
+
+            try (BufferedReader br = new BufferedReader(new FileReader("StudentInfo.txt"))) {
+                String line;
+                int i = 0;
+
+                while ((line = br.readLine()) != null) {
+                    if (i != row) list.add(line);
+                    i++;
+                }
+            } catch (IOException ex) {
+                System.out.println(ex);
+            }
+
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter("StudentInfo.txt"))) {
+                for (String s : list) bw.write(s + "\n");
+            } catch (IOException ex) {
+                System.out.println(ex);
+            }
+
+            read();
+            clearFields();
+            JOptionPane.showMessageDialog(null, "Deleted Successfully!");
+	});
 		
 		
-		setTitle("Expense Tracker");
+		Clear.addActionListener(e5 -> {
+			clearFields();
+		});
+		
+		setTitle("Student Information Form");
 		setLayout(null);
-		setSize(800,400);
+		setSize(445,405);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setLocationRelativeTo(null);
 		setVisible(true);
 	}
+	
+	public static void read() {
+		model.setRowCount(0);
+		
+		try (BufferedReader br = new BufferedReader(new FileReader("StudentInfo.txt"))) {
+			String line;
+			while((line = br.readLine()) != null) {
+				String row[] = line.split(" - ");
+				if (row.length == 3)
+				model.addRow(row);
+			}
+		} catch (IOException e2) {
+			System.err.println("System Error: " + e2.getMessage());
+		}
+			
+	}
+	
+	public static void clearFields() {
+	       name.setText("");
+	       course.setText("");
+	       section.setText("");
+	    }
 
 	public static void main(String[] args) {
-		new ExpenseTracker();
-
+		new SIF();
 	}
 
 }
