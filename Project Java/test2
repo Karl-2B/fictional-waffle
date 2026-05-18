@@ -1,0 +1,139 @@
+package sadaya_568050;
+
+import javax.swing.*;
+import java.io.*;
+import java.awt.*;
+
+public class Conversion extends JFrame{
+	
+	static JTextField Input, Output;
+	static JComboBox<String> numberSystems;
+	
+	Conversion() {
+		JLabel sourceTitle = new JLabel("Conversion Options");
+		add(sourceTitle).setBounds(30,10,170,20);
+		
+		String[] options = {
+	            "Octal to Hexadecimal",
+	            "Decimal to Octal",
+	            "Hexadecimal to Binary",
+	            "Decimal to Hexadecimal",
+	            "Binary to Hexadecimal"
+		};
+		
+		numberSystems = new JComboBox<>(options);
+        add(numberSystems).setBounds(30, 30, 220, 25);
+        
+        JLabel inputTitle = new JLabel("Input Value:");
+        add(inputTitle).setBounds(30, 80, 100, 20);
+
+        Input = new JTextField();
+        add(Input).setBounds(30, 100, 170, 25);
+        
+        JLabel outputTitle = new JLabel("Result:");
+        add(outputTitle).setBounds(250, 80, 100, 20);
+
+        Output = new JTextField();
+        add(Output).setBounds(250, 100, 170, 25);
+        Output.setEditable(false);
+        Output.setBackground(new Color(235, 235, 235));
+        
+        JButton Convert = new JButton("Convert");
+        add(Convert).setBounds(150, 160, 150, 30);
+        
+        Convert.addActionListener(e -> {
+        	try {
+                String input = Input.getText().trim().toUpperCase();
+                String selectedMode = (String) numberSystems.getSelectedItem();
+
+                if (input.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Please Enter a Value");
+                    return;
+                }
+                
+                String allowedChars = "";
+                String errorMessage = "";
+                
+                if (selectedMode.startsWith("Binary")) {
+                    allowedChars = "01";
+                    errorMessage = "Binary numbers only allow digits 0 and 1.";
+                } else if (selectedMode.startsWith("Octal")) {
+                    allowedChars = "01234567";
+                    errorMessage = "Octal numbers only allow digits 0 to 7.";
+                } else if (selectedMode.startsWith("Decimal")) {
+                    allowedChars = "0123456789";
+                    errorMessage = "Decimal numbers only allow digits 0 to 9.";
+                } else if (selectedMode.startsWith("Hexadecimal")) {
+                    allowedChars = "0123456789ABCDEF";
+                    errorMessage = "Hexadecimal allows 0-9 and A-F.";
+                }
+                
+                for (int i = 0; i < input.length(); i++) {
+                    char c = input.charAt(i);
+                    
+                    if (allowedChars.indexOf(c) == -1) {
+                        JOptionPane.showMessageDialog(null, "Illegal input! " + errorMessage);
+                        return;
+                    }
+                }
+                
+                int baseSource = 10;
+                if (selectedMode.startsWith("Octal")) baseSource = 8;
+                else if (selectedMode.startsWith("Hexadecimal")) baseSource = 16;
+                else if (selectedMode.startsWith("Binary")) baseSource = 2;
+                
+                int baseTarget = 10;
+                if (selectedMode.endsWith("Octal")) baseTarget = 8;
+                else if (selectedMode.endsWith("Hexadecimal")) baseTarget = 16;
+                else if (selectedMode.endsWith("Binary")) baseTarget = 2;
+                
+                long decimalValue = 0;
+
+                for (int i = 0; i < input.length(); i++) {
+                    char c = input.charAt(i);
+                    int numberValue = 0;
+
+                    if (c >= '0' && c <= '9') {
+                    	numberValue = c - '0';
+                    } 
+                    else if (c >= 'A' && c <= 'F') {
+                    	numberValue = c - 'A' + 10;
+                    }
+                    int power = input.length() - 1 - i;
+                    decimalValue += numberValue * (long)Math.pow(baseSource, power);
+                }
+
+                String digits = "0123456789ABCDEF";
+                StringBuilder sb = new StringBuilder();
+
+                if (decimalValue == 0) {
+                    sb.append("0");
+                } else {
+                    while (decimalValue > 0) {
+                        int remainder = (int)(decimalValue % baseTarget);
+                        sb.insert(0, digits.charAt(remainder));
+                        decimalValue = decimalValue / baseTarget;
+                    }
+                }
+
+                String result = sb.toString();
+                Output.setText(result.toUpperCase());
+                
+        	} catch (Exception ex) {	
+                System.err.print("System Error" + ex);
+            }
+        });
+
+		setTitle("Number Systems Converter");
+		setLayout(null);
+		setSize(480, 240);
+		setLocationRelativeTo(null);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setVisible(true);
+	}
+
+	public static void main(String[] args) {
+		new Conversion();
+	}
+
+}
