@@ -1,0 +1,90 @@
+package main;
+
+import javax.swing.*;
+import java.io.*;
+
+public class Sadaya_568050 {
+    public static void main(String[] args) {
+        int choice;
+        int totalEntries = 0;
+        int totalRating = 0;
+
+        int count5 = 0;
+        int count4 = 0;
+        int count3 = 0;
+        int count2 = 0;
+        int count1 = 0;
+
+        do {
+            try (FileWriter fw = new FileWriter("feedback.txt", true)) {
+                String name = JOptionPane.showInputDialog(null, "What is your name?", "Name", JOptionPane.QUESTION_MESSAGE);
+                String course = JOptionPane.showInputDialog(null, "What is your course?", "Course", JOptionPane.QUESTION_MESSAGE);
+                String feedback = JOptionPane.showInputDialog(null, "What do you think about the lesson?", "Feedback", JOptionPane.QUESTION_MESSAGE);
+                int rating = Integer.parseInt(JOptionPane.showInputDialog(null, "Rate your experience (5 - Highest, 1 - Lowest)", "Rating", JOptionPane.INFORMATION_MESSAGE));
+
+                String label = "";
+                
+                totalEntries++;
+                totalRating += rating;
+
+                if (rating == 5) {
+                    label = "Excellent";
+                    count5++;
+                } else if (rating == 4) {
+                    label = "Good";
+                    count4++;
+                } else if (rating == 3) {
+                    label = "Average";
+                    count3++;
+                } else if (rating == 2) {
+                    label = "Poor";
+                    count2++;
+                } else { 
+                    label = "Very Poor";
+                    count1++;
+                }
+
+                fw.write("--- Student Feedback Records ---\n"
+                        + "Student Name: " + name + "\n"
+                        + "Course: " + course + "\n"
+                        + "Feedback: " + feedback + "\n"
+                        + "Rating: " + rating + " (" + label + ")\n\n");
+                
+                JOptionPane.showMessageDialog(null, "Successfully saved!");
+            } catch (IOException | NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Error: Please enter a valid number for the rating.");
+            }
+            
+            choice = JOptionPane.showConfirmDialog(null, "Do you want to enter another feedback?", "Continue", JOptionPane.YES_NO_OPTION);
+
+        } while (choice == JOptionPane.YES_OPTION);
+
+        JOptionPane.showMessageDialog(null, "Thank you for your feedback!");
+
+        if (totalEntries > 0) {
+            double average = (double) totalRating / totalEntries;
+
+            String bonusChallenge;
+            if (average >= 4.5) {
+                bonusChallenge = "Outstanding Feedback!";
+            } else if (average >= 3.5) {
+                bonusChallenge = "Good Feedback!";
+            } else if (average >= 2.5) {
+                bonusChallenge = "Average Feedback";
+            } else {
+                bonusChallenge = "Needs Improvement";
+            }
+
+            JOptionPane.showMessageDialog(null, "Total Feedbacks: " + totalEntries + "\n"
+                    + "Average Rating: " + String.format("%.2f", average) + " - " + bonusChallenge + "\n\n"
+                    + "Rating Summary:\n"
+                    + "Excellent: " + count5 + "\n"
+                    + "Good: " + count4 + "\n"
+                    + "Average: " + count3 + "\n"
+                    + "Poor: " + count2 + "\n"
+                    + "Very Poor: " + count1 + "\n");
+        } else {
+            JOptionPane.showMessageDialog(null, "No feedback was recorded.");
+        }
+    }
+}
