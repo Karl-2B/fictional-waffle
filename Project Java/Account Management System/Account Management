@@ -1,0 +1,235 @@
+package sadaya_568050;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.*;
+import java.util.ArrayList;
+
+public class AccountManagement extends JFrame {
+
+    static JTextField username, password, fullname;
+
+    static JTable table;
+    static DefaultTableModel model;
+
+    AccountManagement() {
+
+        JLabel userLabel = new JLabel("Username");
+        add(userLabel).setBounds(20, 20, 100, 20);
+
+        username = new JTextField();
+        add(username).setBounds(20, 45, 180, 25);
+
+        JLabel passLabel = new JLabel("Password");
+        add(passLabel).setBounds(220, 20, 100, 20);
+
+        password = new JTextField();
+        add(password).setBounds(220, 45, 180, 25);
+
+        JLabel fullLabel = new JLabel("Full Name");
+        add(fullLabel).setBounds(420, 20, 100, 20);
+
+        fullname = new JTextField();
+        add(fullname).setBounds(420, 45, 180, 25);
+
+        JButton addBtn = new JButton("Add");
+        add(addBtn).setBounds(620, 20, 100, 25);
+
+        JButton updateBtn = new JButton("Update");
+        add(updateBtn).setBounds(620, 50, 100, 25);
+
+        JButton deleteBtn = new JButton("Delete");
+        add(deleteBtn).setBounds(620, 80, 100, 25);
+
+        JButton logoutBtn = new JButton("Logout");
+        add(logoutBtn).setBounds(620, 110, 100, 25);
+
+        String column[] = {"Username", "Password", "Full Name"};
+        model = new DefaultTableModel(column, 0);
+        table = new JTable(model);
+        table.setDefaultEditor(Object.class, null);
+        table.getTableHeader().setBackground(Color.CYAN);
+        JScrollPane pane = new JScrollPane(table);
+        add(pane).setBounds(20, 150, 700, 280);
+
+        table.addMouseListener(new MouseAdapter() {
+
+            public void mouseClicked(MouseEvent e) {
+
+                int row = table.getSelectedRow();
+
+                username.setText(model.getValueAt(row, 0).toString());
+                password.setText(model.getValueAt(row, 1).toString());
+                fullname.setText(model.getValueAt(row, 2).toString());
+            }
+        });
+
+        File file = new File("users.txt");
+
+        try {
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+        } catch (IOException ex) {
+            System.out.println(ex);
+        }
+
+        read();
+        addBtn.addActionListener(e -> {
+
+            String user = username.getText().trim();
+            String pass = password.getText().trim();
+            String full = fullname.getText().trim();
+
+            if (user.isEmpty() || pass.isEmpty() || full.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "All fields are required!");
+                return;
+            }
+
+            try {
+
+                FileWriter writer = new FileWriter("users.txt", true);
+
+                writer.write(user + "," + pass + "," + full + "\n");
+
+                writer.close();
+
+                read();
+                clearFields();
+
+                JOptionPane.showMessageDialog(null, "Added Successfully!");
+
+            } catch (IOException ex) {
+                System.out.println(ex);
+            }
+        });
+
+        updateBtn.addActionListener(e -> {
+            int row = table.getSelectedRow();
+            if (row == -1) {
+                JOptionPane.showMessageDialog(null, "Select a record first!");
+                return;
+            }
+
+            ArrayList<String> list = new ArrayList<>();
+            try (BufferedReader br = new BufferedReader(new FileReader("users.txt"))) {
+
+                String line;
+                int i = 0;
+
+                while ((line = br.readLine()) != null) {
+
+                    if (i == row) {
+                        list.add(
+                            username.getText() + "," +
+                            password.getText() + "," +
+                            fullname.getText()
+                        );
+                    } else {
+                        list.add(line);
+                    }
+
+                    i++;
+                }
+
+            } catch (IOException ex) {
+                System.out.println(ex);
+            }
+
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter("users.txt"))) {
+                for (String s : list) {
+                    bw.write(s + "\n");
+                }
+
+            } catch (IOException ex) {
+                System.out.println(ex);
+            }
+
+            read();
+            clearFields();
+
+            JOptionPane.showMessageDialog(null, "Updated Successfully!");
+        });
+
+        deleteBtn.addActionListener(e -> {
+            int row = table.getSelectedRow();
+            if (row == -1) {
+                JOptionPane.showMessageDialog(null, "Select a record first!");
+                return;
+            }
+
+            ArrayList<String> list = new ArrayList<>();
+            try (BufferedReader br = new BufferedReader(new FileReader("users.txt"))) {
+                String line;
+                int i = 0;
+
+                while ((line = br.readLine()) != null) {
+
+                    if (i != row) {
+                        list.add(line);
+                    }
+
+                    i++;
+                }
+
+            } catch (IOException ex) {
+                System.out.println(ex);
+            }
+
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter("users.txt"))) {
+                for (String s : list) {
+                    bw.write(s + "\n");
+                }
+
+            } catch (IOException ex) {
+                System.out.println(ex);
+            }
+
+            read();
+            clearFields();
+            JOptionPane.showMessageDialog(null, "Deleted Successfully!");
+        });
+
+        logoutBtn.addActionListener(e -> {
+            dispose();
+            new Login();
+        });
+
+        setTitle("Account Management System");
+        setLayout(null);
+        setSize(760, 500);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
+
+    public static void read() {
+        model.setRowCount(0);
+
+        try (BufferedReader br = new BufferedReader(new FileReader("users.txt"))) {
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                String row[] = line.split(",");
+                if (row.length == 3) {
+                    model.addRow(row);
+                }
+            }
+
+        } catch (IOException ex) {
+            System.out.println(ex);
+        }
+    }
+
+    public static void clearFields() {
+
+        username.setText("");
+        password.setText("");
+        fullname.setText("");
+
+        table.clearSelection();
+    }
+}
