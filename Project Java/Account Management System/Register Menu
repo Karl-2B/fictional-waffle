@@ -1,0 +1,113 @@
+package sadaya_568050;
+
+import javax.swing.*;
+import java.io.*;
+
+public class Register extends JFrame {
+
+    static JTextField username, fullname;
+    static JPasswordField password;
+
+    Register() {
+
+        JLabel userLabel = new JLabel("Username");
+        add(userLabel).setBounds(50, 30, 100, 20);
+
+        username = new JTextField();
+        add(username).setBounds(150, 30, 180, 25);
+
+        JLabel passLabel = new JLabel("Password");
+        add(passLabel).setBounds(50, 70, 100, 20);
+
+        password = new JPasswordField();
+        add(password).setBounds(150, 70, 180, 25);
+
+        JLabel fullLabel = new JLabel("Full Name");
+        add(fullLabel).setBounds(50, 110, 100, 20);
+
+        fullname = new JTextField();
+        add(fullname).setBounds(150, 110, 180, 25);
+
+        JButton register = new JButton("Register");
+        add(register).setBounds(50, 170, 100, 30);
+
+        JButton clear = new JButton("Clear");
+        add(clear).setBounds(160, 170, 80, 30);
+
+        JButton back = new JButton("Back");
+        add(back).setBounds(250, 170, 80, 30);
+
+        register.addActionListener(e -> {
+
+            String user = username.getText().trim();
+            String pass = String.valueOf(password.getPassword());
+            String full = fullname.getText().trim();
+
+            if (user.isEmpty() || pass.isEmpty() || full.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "All fields are required!");
+                return;
+            }
+
+            try {
+
+                File file = new File("users.txt");
+                if (!file.exists()) {
+                    file.createNewFile();
+                }
+
+                BufferedReader br = new BufferedReader(new FileReader(file));
+
+                String line;
+                boolean exists = false;
+
+                while ((line = br.readLine()) != null) {
+                    String data[] = line.split(",");
+
+                    if (data[0].equals(user)) {
+                        exists = true;
+                        break;
+                    }
+                }
+
+                br.close();
+                if (exists) {
+                    JOptionPane.showMessageDialog(null, "Username already exists!");
+                    return;
+                }
+
+                FileWriter writer = new FileWriter(file, true);
+                writer.write(user + "," + pass + "," + full + "\n");
+                writer.close();
+
+                JOptionPane.showMessageDialog(null, "Registered Successfully!");
+                clearFields();
+
+            } catch (IOException ex) {
+                System.out.println(ex);
+            }
+
+        });
+
+        clear.addActionListener(e -> {
+            clearFields();
+        });
+
+        back.addActionListener(e -> {
+            dispose();
+            new Login();
+        });
+
+        setTitle("Register Form");
+        setLayout(null);
+        setSize(420, 300);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
+
+    public void clearFields() {
+        username.setText("");
+        password.setText("");
+        fullname.setText("");
+    }
+}
