@@ -1,0 +1,191 @@
+package Intervention;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.io.*;
+import java.awt.*;
+
+public class PayrollSystem extends JFrame{
+	
+	private final JTextField idField = new JTextField();
+	private final JTextField productField = new JTextField();
+	private final JTextField customerField = new JTextField();
+	private final JTextField quantityField = new JTextField();
+	private final JTextField priceField = new JTextField();
+	private final JTextField dateField = new JTextField();
+	private final JTextField paymentField = new JTextField();
+	
+	private final String[] columns = {"Employee ID", "Employee Name", "Position", "Hours Worked", "Hourly Rate", "Total Salary", "Pay Date"};
+	
+	private final DefaultTableModel model = new DefaultTableModel(columns, 0);
+	private final JTable table = new JTable(model);
+	private final String FILE = "payroll.txt";
+	
+	public PayrollSystem(){
+		setTitle("Employee Payroll Record System");
+		setSize(820,520);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setLayout(new BorderLayout(10,10));
+		setLocationRelativeTo(null);
+		
+		add(new JScrollPane(table), BorderLayout.CENTER);
+		table.getSelectionModel().addListSelectionListener(e -> fillFields());
+		
+		JPanel inputs = new JPanel(new GridLayout(7,2,5,5));
+		inputs.setBorder(BorderFactory.createTitledBorder("Payroll Details"));
+		inputs.add(new JLabel ("Employee ID"));
+		inputs.add(idField);
+		inputs.add(new JLabel ("Employee Name"));
+		inputs.add(productField);
+		inputs.add(new JLabel ("Position"));
+		inputs.add(customerField);
+		inputs.add(new JLabel ("Hours Worked"));
+		inputs.add(quantityField);
+		inputs.add(new JLabel ("Hourly Rate"));
+		inputs.add(priceField);
+		inputs.add(new JLabel ("Total Salary"));
+		inputs.add(dateField);
+		inputs.add(new JLabel ("Pay Date"));
+		inputs.add(paymentField);
+		
+		JPanel buttons = new JPanel();
+		addButton(buttons, "Add", e -> addRecord());
+		addButton(buttons, "Update", e -> updateRecord());
+		addButton(buttons, "Delete", e -> deleteRecord());
+		addButton(buttons, "Clear", e -> clearFields());
+		addButton(buttons, "Exit", e -> System.exit(0));
+		
+		JPanel bottom = new JPanel(new BorderLayout());
+		bottom.add(inputs, BorderLayout.CENTER);
+		bottom.add(buttons, BorderLayout.SOUTH);
+		add(bottom, BorderLayout.SOUTH);
+		
+		loadFromFile();
+	}
+	
+	private void addButton(JPanel p, String name, java.awt.event.ActionListener a ) {
+		JButton b = new JButton(name);
+		b.addActionListener(a);
+		p.add(b);
+	}
+	
+	private Object[] readFields() {
+		String id = idField.getText().trim();
+		String product = productField.getText().trim();
+		String customer = customerField.getText().trim();
+		String qty = quantityField.getText().trim();
+		String prc = priceField.getText().trim();
+		String date = dateField.getText().trim();
+		String payment = paymentField.getText().trim();
+		
+		if(id.isEmpty() || product.isEmpty() || customer.isEmpty() || qty.isEmpty() || prc.isEmpty() || date.isEmpty() || payment.isEmpty()) {
+			JOptionPane.showMessageDialog(this, "Please fill all fields");
+			return null;
+		}
+		
+		try {
+			int quantity = Integer.parseInt(qty);
+			int price = Integer.parseInt(prc);
+			return new Object[] {id,product,customer,quantity,price,date,payment};
+		} catch (NumberFormatException ex) {
+			JOptionPane.showMessageDialog(this, "Quantity and Price must be numbers");
+			return null;
+		}
+		
+	}
+	
+	private void addRecord() {
+		Object[] row = readFields();
+		if (row != null) {
+			model.addRow(row);
+			saveToFile();
+			clearFields();
+		}
+	}
+	
+	private void updateRecord() {
+		int row = table.getSelectedRow();
+		if(row == -1) {
+			JOptionPane.showMessageDialog(this, "Please select a record");
+			return;
+		}
+		Object[] newRow = readFields();
+		if(newRow != null) {
+			model.removeRow(row);
+			model.insertRow(row, newRow);
+			saveToFile();
+			clearFields();
+		}
+	}
+	
+	private void deleteRecord() {
+		int row = table.getSelectedRow();
+		if(row == -1) {
+			JOptionPane.showMessageDialog(this, "Please select a record");
+			return;
+		}
+		model.removeRow(row);
+		saveToFile();
+		clearFields();
+	}
+	
+	private void clearFields() {
+		idField.setText("");
+		productField.setText("");
+		customerField.setText("");
+		quantityField.setText("");
+		priceField.setText("");
+		dateField.setText("");
+		paymentField.setText("");
+	}
+	
+	private void fillFields() {
+		int row = table.getSelectedRow();
+		if(row == -1) {
+			return;
+		}
+		idField.setText(model.getValueAt(row, 0).toString());
+		productField.setText(model.getValueAt(row, 1).toString());
+		customerField.setText(model.getValueAt(row, 2).toString());
+		quantityField.setText(model.getValueAt(row, 3).toString());
+		priceField.setText(model.getValueAt(row, 4).toString());
+		dateField.setText(model.getValueAt(row, 5).toString());
+		paymentField.setText(model.getValueAt(row, 6).toString());
+	}
+	
+	private void saveToFile() {
+		try(PrintWriter write = new PrintWriter(new FileWriter(FILE))) {
+			for (int items = 0; items < model.getRowCount(); items++) {
+				write.println(model.getValueAt(items, 0) + ","
+						+ model.getValueAt(items, 1) + ","
+						+ model.getValueAt(items, 2) + ","
+						+ model.getValueAt(items, 3) + ","
+						+ model.getValueAt(items, 4) + ","
+						+ model.getValueAt(items, 5) + ","
+						+ model.getValueAt(items, 6));
+				}	
+			}catch (IOException ex) {
+				JOptionPane.showMessageDialog(this, "Error Saving File: " + ex.getMessage());
+			}
+		
+	}
+	
+	private void loadFromFile() {
+		try(BufferedReader r = new BufferedReader(new FileReader(FILE))) {
+			String line;
+			while((line = r.readLine()) != null) {
+				String[] parts = line.split(",");
+				if(parts.length == 7) {
+					model.addRow(parts);
+				}
+			}
+		}catch (IOException ex) {
+			JOptionPane.showMessageDialog(this, "Error loading file: " + ex.getMessage());
+		}
+	}
+
+	public static void main(String[] args) {
+		new PayrollSystem().setVisible(true);
+	}
+
+}
