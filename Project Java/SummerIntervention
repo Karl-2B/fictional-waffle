@@ -1,28 +1,28 @@
-package Intervention;
+package Information_System;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.io.*;
 import java.awt.*;
 
-public class SaleSystem extends JFrame{
+public class study extends JFrame{
 	
-	private final JTextField idField = new JTextField();
-	private final JTextField productField = new JTextField();
-	private final JTextField customerField = new JTextField();
-	private final JTextField quantityField = new JTextField();
-	private final JTextField priceField = new JTextField();
-	private final JTextField dateField = new JTextField();
-	private final JTextField paymentField = new JTextField();
+	private final JTextField studentID = new JTextField();
+	private final JTextField firstName = new JTextField();
+	private final JTextField lastName = new JTextField();
+	private final JTextField course = new JTextField();
+	private final JTextField yearLevel = new JTextField();
+	private final JTextField midtermGrade = new JTextField();
+	private final JTextField finalGrade = new JTextField();
 	
-	private final String[] columns = {"Transaction ID", "Product Name", "Customer Field", "Quantity", "Price", "Date", "Payment Method"};
+	private final Object[] column = {"Student ID", "First Name", "Last Name", "Course", "Year Level", "Midterm Grade", "Final Grade"};
 	
-	private final DefaultTableModel model = new DefaultTableModel(columns, 0);
+	private final DefaultTableModel model = new DefaultTableModel(column, 0);
 	private final JTable table = new JTable(model);
-	private final String FILE = "sales.txt";
+	private final String FILE = "student.txt";
 	
-	public SaleSystem(){
-		setTitle("Sales Transaction System");
+	public study() {
+		setTitle("Student Information System");
 		setSize(820,520);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setLayout(new BorderLayout(10,10));
@@ -32,21 +32,21 @@ public class SaleSystem extends JFrame{
 		table.getSelectionModel().addListSelectionListener(e -> fillFields());
 		
 		JPanel inputs = new JPanel(new GridLayout(7,2,5,5));
-		inputs.setBorder(BorderFactory.createTitledBorder("Sales Details"));
-		inputs.add(new JLabel ("Transaction ID"));
-		inputs.add(idField);
-		inputs.add(new JLabel ("Product Name"));
-		inputs.add(productField);
-		inputs.add(new JLabel ("Customer Name"));
-		inputs.add(customerField);
-		inputs.add(new JLabel ("Quantity"));
-		inputs.add(quantityField);
-		inputs.add(new JLabel ("Price"));
-		inputs.add(priceField);
-		inputs.add(new JLabel ("Date (YYYY-MM-DD)"));
-		inputs.add(dateField);
-		inputs.add(new JLabel ("Payment Method"));
-		inputs.add(paymentField);
+		inputs.setBorder(BorderFactory.createTitledBorder("Details:"));
+		inputs.add(new JLabel("Student ID"));
+		inputs.add(studentID);
+		inputs.add(new JLabel ("First Name"));
+		inputs.add(firstName);
+		inputs.add(new JLabel ("Last Name"));
+		inputs.add(lastName);
+		inputs.add(new JLabel ("Course"));
+		inputs.add(course);
+		inputs.add(new JLabel ("Year Level"));
+		inputs.add(yearLevel);
+		inputs.add(new JLabel ("Midterm Grades"));
+		inputs.add(midtermGrade);
+		inputs.add(new JLabel ("Final Grade"));
+		inputs.add(finalGrade);
 		
 		JPanel buttons = new JPanel();
 		addButton(buttons, "Add", e -> addRecord());
@@ -63,41 +63,41 @@ public class SaleSystem extends JFrame{
 		loadFromFile();
 	}
 	
-	private void addButton(JPanel p, String name, java.awt.event.ActionListener a ) {
+	private void addButton(JPanel p, String name, java.awt.event.ActionListener a) {
 		JButton b = new JButton(name);
 		b.addActionListener(a);
 		p.add(b);
 	}
 	
 	private Object[] readFields() {
-		String id = idField.getText().trim();
-		String product = productField.getText().trim();
-		String customer = customerField.getText().trim();
-		String qty = quantityField.getText().trim();
-		String prc = priceField.getText().trim();
-		String date = dateField.getText().trim();
-		String payment = paymentField.getText().trim();
 		
-		if(id.isEmpty() || product.isEmpty() || customer.isEmpty() || qty.isEmpty() || prc.isEmpty() || date.isEmpty() || date.isEmpty() || payment.isEmpty()) {
-			JOptionPane.showMessageDialog(this, "Please fill all fields");
+		String ID = studentID.getText().trim();
+		String First = firstName.getText().trim();
+		String Last = lastName.getText().trim();
+		String Course = course.getText().trim();
+		String Year = yearLevel.getText().trim();
+		String Midterm = midtermGrade.getText().trim();
+		String Final = finalGrade.getText().trim();
+		
+		if(ID.isEmpty() || First.isEmpty() || Last.isEmpty() || Course.isEmpty() || Year.isEmpty() || Midterm.isEmpty() || Final.isEmpty()) {
+			JOptionPane.showMessageDialog(this, "Please fill all fields!");
 			return null;
 		}
-		
 		try {
-			int quantity = Integer.parseInt(qty);
-			int price = Integer.parseInt(prc);
-			return new Object[] {id,product,customer,quantity,price,date,payment};
-		} catch (NumberFormatException ex) {
-			JOptionPane.showMessageDialog(this, "Quantity and Price must be numbers");
+			int mid = Integer.parseInt(Midterm);
+			int finale = Integer.parseInt(Final);
+			return new Object[] {ID, First, Last, Course, Year, mid, finale};
+		}catch (NumberFormatException ex) {
+			JOptionPane.showMessageDialog(this, "Midterm Grade and Finals must be Numbers");
 			return null;
 		}
 		
 	}
 	
 	private void addRecord() {
-		Object[] row = readFields();
-		if (row != null) {
-			model.addRow(row);
+		Object[] rows = readFields();
+		if(rows != null) {
+			model.addRow(rows);
 			saveToFile();
 			clearFields();
 		}
@@ -106,7 +106,7 @@ public class SaleSystem extends JFrame{
 	private void updateRecord() {
 		int row = table.getSelectedRow();
 		if(row == -1) {
-			JOptionPane.showMessageDialog(this, "Please select a record");
+			JOptionPane.showMessageDialog(this, "Please select a record!");
 			return;
 		}
 		Object[] newRow = readFields();
@@ -121,7 +121,7 @@ public class SaleSystem extends JFrame{
 	private void deleteRecord() {
 		int row = table.getSelectedRow();
 		if(row == -1) {
-			JOptionPane.showMessageDialog(this, "Please select a record");
+			JOptionPane.showMessageDialog(this, "Please select a record!");
 			return;
 		}
 		model.removeRow(row);
@@ -130,63 +130,63 @@ public class SaleSystem extends JFrame{
 	}
 	
 	private void clearFields() {
-		idField.setText("");
-		productField.setText("");
-		customerField.setText("");
-		quantityField.setText("");
-		priceField.setText("");
-		dateField.setText("");
-		paymentField.setText("");
+		studentID.setText("");
+		firstName.setText("");
+		lastName.setText("");
+		course.setText("");
+		yearLevel.setText("");
+		midtermGrade.setText("");
+		finalGrade.setText("");
 	}
 	
 	private void fillFields() {
 		int row = table.getSelectedRow();
 		if(row == -1) {
-			JOptionPane.showMessageDialog(this, "Please select a record");
 			return;
+		}
+		studentID.setText(model.getValueAt(row, 0).toString());
+		firstName.setText(model.getValueAt(row, 1).toString());
+		lastName.setText(model.getValueAt(row, 2).toString());
+		course.setText(model.getValueAt(row, 3).toString());
+		yearLevel.setText(model.getValueAt(row, 4).toString());
+		midtermGrade.setText(model.getValueAt(row, 5).toString());
+		finalGrade.setText(model.getValueAt(row, 6).toString());
 	}
-		idField.setText(model.getValueAt(row, 0).toString());
-		productField.setText(model.getValueAt(row, 1).toString());
-		customerField.setText(model.getValueAt(row, 2).toString());
-		quantityField.setText(model.getValueAt(row, 3).toString());
-		priceField.setText(model.getValueAt(row, 4).toString());
-		dateField.setText(model.getValueAt(row, 5).toString());
-		paymentField.setText(model.getValueAt(row, 6).toString());
-}
 	
 	private void saveToFile() {
 		try(PrintWriter write = new PrintWriter(new FileWriter(FILE))) {
-			for (int items = 0; items < model.getRowCount(); items++) {
+			for(int items = 0; items < model.getRowCount(); items++ ) {
 				write.println(model.getValueAt(items, 0) + ","
 						+ model.getValueAt(items, 1) + ","
-						+ model.getValueAt(items, 2) + ","
+						+ model.getValueAt(items, 2)
 						+ model.getValueAt(items, 3) + ","
 						+ model.getValueAt(items, 4) + ","
 						+ model.getValueAt(items, 5) + ","
-						+ model.getValueAt(items, 6));
-				}	
-			}catch (IOException ex) {
-				JOptionPane.showMessageDialog(this, "Error Saving File: " + ex.getMessage());
+						+ model.getValueAt(items, 6) + ",");
 			}
-		
+		}catch (IOException e) {
+			JOptionPane.showMessageDialog(this, "Error: " + e);
+			return;
+		}
 	}
 	
 	private void loadFromFile() {
-		try(BufferedReader r = new BufferedReader(new FileReader(FILE))) {
+		try(BufferedReader br = new BufferedReader(new FileReader(FILE))) {
 			String line;
-			while((line = r.readLine()) != null) {
+			while((line = br.readLine()) != null) {
 				String[] parts = line.split(",");
 				if(parts.length == 7) {
 					model.addRow(parts);
 				}
 			}
-		}catch (IOException ex) {
-			JOptionPane.showMessageDialog(this, "Error loading file: " + ex.getMessage());
+		}catch (IOException e1) {
+			JOptionPane.showMessageDialog(this, "Error File: " + e1);
+			return;
 		}
 	}
 
 	public static void main(String[] args) {
-		new SaleSystem().setVisible(true);
+		new study().setVisible(true);
 	}
 
 }
