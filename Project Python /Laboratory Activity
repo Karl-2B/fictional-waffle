@@ -1,0 +1,43 @@
+print("Hello, World!")
+
+# Name: Karl Travish G. Sadaya
+# Section: 3418 - IT5L
+# Activity: Lab Activity 2
+
+# Declaration of Variables
+donut = "Barvarian"
+price = 75
+quantity = 0
+is_paid = False
+
+# Check Variable Types
+# print(type(donut))
+# print(type(price))
+# print(type(quantity))
+# print(type(is_paid))
+
+# Print Variables
+print("// Dunkin Donuts Management System \\")
+print("Donut Type:",donut)
+print(f"Price: {price:.2f}")
+print("Quantity: ", quantity)
+print("Paid?", is_paid)
+
+customer_name = input("Enter your name: ")
+quantity = int(input("Enter the quantity of donuts: "))
+
+total = price * quantity
+
+cash = int(input("Enter Cash Amount: "))
+
+change = cash - total
+is_paid = cash >= total
+
+print(" ")
+print("// Receipt \\")
+print(f"Customer Name: {customer_name}")
+print(f"Total Price: {total:.2f}")
+print("Quantity:", quantity)
+print(f"Payment: {cash:.2f}")
+print(f"Change: {change:.2f}")
+print(f"Payment Status: {is_paid}")
